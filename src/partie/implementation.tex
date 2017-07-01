@@ -1,0 +1,663 @@
+\newpage
+\section{Implémentation}
+Dans cette partie, j'expliquerai en détail le travail réalisé durant le semestre, la première phase de développement en langage C a pris la majeure partie du temps, pour la partie JavaScript,  c'était plutôt de l'adaptation de code.\\
+
+Tout le code et la procédure de prise en main et d'installation sont disponibles sur le dépôt GitLab du projet et de l'archive jointe à ce rapport.\\
+
+
+\subsection{Partie Arduino langage C}
+\subsubsection{Structure du projet}
+\begin{center}
+\begin{tabular}{c c c}
+\begin{minipage}{4cm}
+ \begin{forest}
+      for tree={
+        font=\ttfamily,
+        grow'=0,
+        child anchor=west,
+        parent anchor=south,
+        anchor=west,
+        calign=first,
+        inner xsep=7pt,
+        edge path={
+          \noexpand\path [draw, \forestoption{edge}]
+          (!u.south west) +(7.5pt,0) |- (.child anchor) pic {folder} \forestoption{edge label};
+        },
+        % style for your file node 
+        file/.style={edge path={\noexpand\path [draw, \forestoption{edge}]
+          (!u.south west) +(7.5pt,0) |- (.child anchor) \forestoption{edge label};},
+          inner xsep=2pt,font=\small\ttfamily
+                     },
+        before typesetting nodes={
+          if n=1
+            {insert before={[,phantom]}}
+            {}
+        },
+        fit=band,
+        before computing xy={l=15pt},
+      }  
+    [oscar
+      [build]
+      [cmake
+      	[ArduinoToolchain.cmake]
+        [Platform[Arduino.cmake]]
+      ]
+      [CMakeLists.txt]
+      [configure]
+      [configure.bat]
+      [doc[html]]
+      [LICENCE]
+      [README.md]
+   	  ]
+      \end{forest}
+\end{minipage} 
+& \makebox[3cm]{}
+& \begin{minipage}{4cm}
+       \begin{forest}
+      for tree={
+        font=\ttfamily,
+        grow'=0,
+        child anchor=west,
+        parent anchor=south,
+        anchor=west,
+        calign=first,
+        inner xsep=7pt,
+        edge path={
+          \noexpand\path [draw, \forestoption{edge}]
+          (!u.south west) +(7.5pt,0) |- (.child anchor) pic {folder} \forestoption{edge label};
+        },
+        % style for your file node 
+        file/.style={edge path={\noexpand\path [draw, \forestoption{edge}]
+          (!u.south west) +(7.5pt,0) |- (.child anchor) \forestoption{edge label};},
+          inner xsep=2pt,font=\small\ttfamily
+                     },
+        before typesetting nodes={
+          if n=1
+            {insert before={[,phantom]}}
+            {}
+        },
+        fit=band,
+        before computing xy={l=15pt},
+      }  
+      [oscar[src
+      [AIRQUALIB[AIRQUALIB[AIRQUALIB.cpp,file][AIRQUALIB.h,file][CMakeLists.txt,file]]
+      [examples[airqua\_ble[airqua\_ble.ino,file]][airqua\_eth[airqua\_eth.ino,file]]
+      [airqua\_wifi[airqua\_wifi.ino,file]]]]
+      [MQLIB[CMakeLists.txt][example[example.ino,file]][MQLIB[CMakeLists.txt,file][MQLIB.cpp,file][MQLIB.h,file]]]
+      [V1AIRQUA[v1\_airqua\_ble[v1\_airquable.ino,file]][v1\_airqua\_eth[v1\_airqua\_eth.ino,file]]
+      [v1\_airqua\_wifi[v1\_airqua\_wifi.ino,file]]]]]
+      \end{forest}
+\end{minipage}
+\end{tabular}
+\end{center}
+
+\begin{verbatim}
+--------------------------------------------------------------------------
+Langage                      fichiers       espace    commentaire     code
+--------------------------------------------------------------------------
+Arduino Sketch                   7            273         457          792
+C++                              2             43         110          149
+C/C++ Header                     2             66         150           70
+CMake                            5             38          46           60
+--------------------------------------------------------------------------
+TOTAL:                          16            420         763         1071
+--------------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Fichiers                                       	 espace  commentaire  code
+--------------------------------------------------------------------------
+src/V1_AIRQUA/v1_airqua_ble/v1_airqua_ble.ino       51       100       180
+src/V1_AIRQUA/v1_airqua_wifi/v1_airqua_wifi.ino     53       100       164
+src/V1_AIRQUA/v1_airqua_eth/v1_airqua_eth.ino       51        69       135
+src/AIRQUALIB/examples/airqua_ble/airqua_ble.ino    36        69       107
+src/AIRQUALIB/examples/airqua_wifi/airqua_wifi.ino  39        68        90
+src/AIRQUALIB/AIRQUALIB/AIRQUALIB.cpp               22        49        88
+src/AIRQUALIB/examples/airqua_eth/airqua_eth.ino    34        38        62
+src/MQLIB/MQLIB/MQLIB.cpp                           21        61        61
+src/MQLIB/example/example.ino                        9        13        54
+src/MQLIB/MQLIB/MQLIB.h                             47       111        50
+src/AIRQUALIB/examples/CMakeLists.txt               13        14        20
+src/AIRQUALIB/AIRQUALIB/AIRQUALIB.h                 19        39        20
+src/V1_AIRQUA/CMakeLists.txt                        10        13        19
+src/AIRQUALIB/AIRQUALIB/CMakeLists.txt               6         7         8
+src/MQLIB/CMakeLists.txt                             5         6         7
+src/MQLIB/MQLIB/CMakeLists.txt                       4         6         6
+--------------------------------------------------------------------------
+TOTAL:                                              420      763      1071
+--------------------------------------------------------------------------
+
+\end{verbatim}
+
+
+\newpage
+\subsubsection{MQLIB}
+Dans cette première étape, j'ai commencé par la lecture des  fiches techniques des capteurs et de l'Arduino Uno r3.
+Ensuite, j'ai continué la recherche sur les forums d'Arduino et des capteurs de gaz afin de récolter le maximum d'informations sur le matériels avant la phase de développement.\\
+
+Le premier programme, appelé aussi croquis\footnote{Un programme écrit avec IDE pour Arduino s'appelle un croquis} Arduino, était très simple et consistait à lire une valeur analogique à partir des différents capteurs, afin de s'assurer de leurs bons fonctionnements.\\
+\begin{lstlisting}
+/* Pin sur lequel le capteur est connecter */
+int sensorPin = A0;  
+
+void setup() {
+  /* UART reglages, baudrate = 9600bps.*/
+  Serial.begin(9600); 
+}
+
+void loop() {
+  /* Lecture et affichage de la valeur du capteur */
+  Serial.print("Value of sensor is: "+analogRead(sensorPin);
+  Serial.print("\");
+}
+\end{lstlisting}
+Ensuite, j'ai implémenté un programme qui permet de lire des valeurs en PPM\footnote{Partie par million, fraction valant un millionième}, pour la liste des gaz supportés par les capteurs MQ (MQ2, MQ6, MQ8).\\
+A la fin, j'ai intégré tout le code dans une libraire pour Arduino, qui facilite l'utilisation des capteurs avec un simple import.
+\begin{lstlisting}
+/* Declaration de la librairie MQLIB pour Arduino */
+#ifndef MQLIB_H
+#define MQLIB_H
+
+#if ARDUINO >= 100
+ #include "Arduino.h"
+#else
+ #include "WProgram.h"
+#endif
+...
+#endif
+}
+\end{lstlisting}
+j'ai ajouté un croquis qui permet de tester MQLIB et faciliter le travail des développeurs qui veulent l'utiliser ou l’améliorer.  
+\begin{lstlisting}
+void loop() {
+
+  /* Q2 Sensor */
+  Serial.print("MQ2 SENSOR");
+  Serial.print("LPG:");
+  Serial.print(air.displayGasValue(air.sensorA, GAS_LPG));
+  Serial.print("ppm");
+  Serial.print("    ");
+  Serial.print("CO:");
+  Serial.print(air.displayGasValue(air.sensorA, GAS_CO));
+  Serial.print("ppm");
+  Serial.print("    ");
+  Serial.print("SMOKE:");
+  Serial.print(air.displayGasValue(air.sensorA, GAS_SMOKE));
+  Serial.print("ppm");
+  Serial.print("\n");
+
+  /* Q6 Sensor */
+  Serial.print("MQ6 SENSOR");
+  Serial.print("LPGQ6:");
+  Serial.print(air.displayGasValue(air.sensorB, GAS_LPGQ6));
+  Serial.print("ppm");
+  Serial.print("        ");
+  Serial.print("CH4::");
+  Serial.print(air.displayGasValue(air.sensorB, GAS_CH4));
+  Serial.print("ppm");
+  Serial.print("\n");
+
+  /* Q8 Sensor */
+  Serial.print("MQ8 SENSOR");
+  Serial.print("H2:");
+  Serial.print(air.displayGasValue(air.sensorC, GAS_H2));
+  Serial.print("ppm");
+  Serial.print("\n");
+  Serial.print("\n");
+  delay(200);
+}
+\end{lstlisting}
+
+\newpage
+\subsubsection{AIRQUA}
+J'ai implémenté un serveur web (REST) qui utilise MQLIB et peut être interrogé avec de simples requêtes GET, en fonction de la requête envoyée la réponse est renvoyée sous format JSON. Ensuite, j'ai intégré le serveur Web dans une librairie Arduino. 
+\begin{lstlisting}
+...
+/** class declaration.*/
+class AIRQUA {
+
+...
+
+/** 
+* constructor3
+* @param mq_pin1 - analog input channel you are going to use
+* @param mq_pin2 - analog input channel you are going to use
+* @param mq_pin3 - analog input channel you are going to use
+*/
+AIRQUA(uint8_t mq_pin1, uint8_t mq_pin2, uint8_t mq_pin3);
+
+/**
+ *  display current sensor value to client.
+ *  @param sensorName is String argument which set sensor name.
+ *  @param gasTypes is String argument which set sensor gas type.
+ *  @param value is String argument which set sensor value.
+ *  @return string sensor value
+ */
+    String sensorValue(String sensorName, String gasTypes, int value);
+
+
+/**
+ *  display sensor informations to client in Json format.
+ *  @param sensorName is String argument which set sensor name.
+ *  @param model is String argument which set sensor model.
+ *  @param reference is String argument which set sensor reference.
+ *  @param unite is String argument which set sensor unite.
+ *  @param gasTypes is String argument which set sensor gas type (write it in
+ * Json nested array format ex. "[\"LPG\",\"CO\",\"SMOKE\"]" ).
+ *  @return string sensor informations
+ */
+    String sensorType(String sensorName, String model, String reference,String unite, String gasTypes);
+
+/**
+ *  display the response to the http request
+ *  @param httpRequest is String argument which set http header content.
+ *  @return response is String 
+ */
+    String responseRequest(String httpRequest);
+};
+
+#endif
+
+\end{lstlisting}
+\paragraph{Wifi:}
+Cette version permet d’interroger AIRQUA en utilisant des requêtes GET via une connexion Wifi.
+
+\begin{lstlisting}
+...
+void setup()
+{
+    /* Initialize serial and wait for port to open: */
+    Serial.begin(9600);
+
+    /* check for the presence of the shield: */
+    if (WiFi.status() == WL_NO_SHIELD)
+    {
+        Serial.println("WiFi shield not present");
+
+    }
+
+    /* check firmware version */
+    String fv = WiFi.firmwareVersion();
+    if (fv != "1.1.0")
+    {
+        Serial.println("Please upgrade the firmware");
+    }
+      
+    /* attempt to connect to Wifi network: */
+    while (status != WL_CONNECTED && attemps <= 3)
+    {
+        Serial.print("Attempting to connect to SSID: ");
+        Serial.println(ssid);
+        /* Connect to WPA/WPA2 network. Change this */
+        /* line if using open or WEP network: */
+        status = WiFi.begin(ssid, pass);
+        attemps++;
+        /* wait 10 seconds for connection: */
+        delay(10000);
+    }
+    
+    /* start wifi server */
+    server.begin();
+    /* you're connected now, so print out the status: */
+    printWifiStatus();
+        
+   ...
+   
+void printWifiStatus()
+{
+    /* print the SSID of the network you're attached to: */
+    Serial.print("SSID: ");
+    Serial.println(WiFi.SSID());
+
+    /* print your WiFi shield's IP address: */
+    IPAddress ip = WiFi.localIP();
+    Serial.print("IP Address: ");
+    Serial.println(ip);
+
+    /* print the received signal strength: */
+    long rssi = WiFi.RSSI();
+    Serial.print("signal strength (RSSI):");
+    Serial.print(rssi);
+    Serial.println(" dBm");
+}
+
+\end{lstlisting}
+
+\paragraph{Ethernet:}
+C'est les mêmes fonctions que le serveur que Wifi sauf pour la partie connectique, il exploite un port Ethernet connecté à l'Arduino pour transférer les données.
+\begin{lstlisting}
+...
+/** enter a MAC address and IP address for your controller below. */
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+
+/** the IP address will be dependent on your local network: */
+IPAddress ip(192, 168, 1, 127);
+
+/** 
+ * initialize the Ethernet server library
+ * with the IP address and port you want to use
+ * (port 80 is default for HTTP):
+ */
+EthernetServer server(80);
+...
+
+\end{lstlisting}
+
+
+\paragraph{Bluetooth:}
+J'ai développé un programme qui permet une communication avec un périphérique doté de la technologie Bluetooth, pour mes essais j'ai utilisé un smartphone et un ordinateur.
+Il permet les mêmes fonctionnalités que les deux versions précédentes, mais la partie communication est différente car l'utilisation du Bluetooth impose beaucoup de code en plus et davantage de restrictions pour le transfert des données.
+
+\begin{lstlisting}
+...
+/** 
+ * for Uno:
+ * HM10 TX pin to Arduino Uno pin D6
+ * HM10 RX pin to Arduino Uno pin D7
+ * for Mega 2560: 
+ * HM10 TX pin to Arduino Mega 2650 pin D10
+ * HM10 RX pin to Arduino Mega 2560 pin D11
+ */
+SoftwareSerial ble(6,7);        
+
+/** buffer to store response */
+char buffer[BUFFER_LENGTH];   
+...
+
+/**
+ *  Loop() is where the code that runms ovewr and over goes (your program).
+ *  Listen to client requests and returns resposes.
+ */
+void loop() {
+  
+  if (ble.available()) {
+
+    char request[200] = {0};
+    int i = 0;
+    while (ble.available()){
+      char c = ble.read();
+      request[i++] = c;
+      delay(200); 
+    }
+
+    Serial.println(request);
+
+    String response = airqua.responseRequest(request);
+    /* display response for current client request */
+    ble.println(response);
+
+  } 
+}
+
+\end{lstlisting}
+
+Les possibilités sont les suivantes:
+
+- Valeur actuelle du capteur.
+\begin{lstlisting}[language=bash]
+curl --get http://192.168.0.21/sensors/co/value
+{"name":"MQ2","gasTypes":"co","value":"0"}
+\end{lstlisting}
+
+- Type du capteur.
+\begin{lstlisting}[language=bash]
+sparow@debian:~$ curl --get http://192.168.0.21/sensors/h2/type
+{"name":"Gas","model":"MQ8","reference":"MQ-8","unite":"PPM","gasTypes":["H2"]}
+\end{lstlisting}
+
+- Toutes les valeurs retournées par les capteurs.
+\begin{lstlisting}[language=bash]
+sparow@debian:~$ curl --get http://192.168.0.21/sensors/values
+{"name":"MQ2","gasTypes":"co","value":"0"}
+{"name":"MQ2","gasTypes":"smoke","value":"0"}
+{"name":"MQ2","gasTypes":"lpg","value":"0"}
+{"name":"MQ6","gasTypes":"lpg","value":"0"}
+{"name":"MQ8","gasTypes":"h2","value":"0"}
+{"name":"MQ6","gasTypes":"ch4","value":"0"}
+\end{lstlisting}
+
+- Tous les types disponibles.
+\begin{lstlisting}[language=bash]
+sparow@debian:~$ curl --get http://192.168.0.21/sensors/types
+{"name":"Gas","model":"MQ2","reference":"MQ-2","unite":"PPM","gasTypes":["LPG","CO","SMOKE"]}
+{"name":"Gas","model":"MQ6","reference":"MQ-6","unite":"PPM","gasTypes":["LPG","CH4"]}
+{"name":"Gas","model":"MQ8","reference":"MQ-8","unite":"PPM","gasTypes":["H2"]}
+\end{lstlisting}
+
+
+
+\subsection{Partie ESP8266 JavaScript}
+
+
+\subsubsection{Structure du projet}
+\begin{forest}
+      for tree={
+        font=\ttfamily,
+        grow'=0,
+        child anchor=west,
+        parent anchor=south,
+        anchor=west,
+        calign=first,
+        inner xsep=7pt,
+        edge path={
+          \noexpand\path [draw, \forestoption{edge}]
+          (!u.south west) +(7.5pt,0) |- (.child anchor) pic {folder} \forestoption{edge label};
+        },
+        % style for your file node 
+        file/.style={edge path={\noexpand\path [draw, \forestoption{edge}]
+          (!u.south west) +(7.5pt,0) |- (.child anchor) \forestoption{edge label};},
+          inner xsep=2pt,font=\small\ttfamily
+                     },
+        before typesetting nodes={
+          if n=1
+            {insert before={[,phantom]}}
+            {}
+        },
+        fit=band,
+        before computing xy={l=15pt},
+      }  
+    [oscar-espruino
+      [Installation.md,file]
+      [README.md,file]
+      [src
+      [modules[MQ135.js,file][MQ135.min.js,file],[PrototypeMQLIB.js,file],[PrototypeMQLIB.min.js,file]]
+      [projets[AirQua.js,file][examples[led\_blink.js,file]
+      [wifi.js,file][wifi\_web\_server.js,file]]]
+      ]
+   	  ]
+      \end{forest}
+\begin{verbatim}
+--------------------------------------------------------------------------
+Langage                  fichiers       espace      commentaire       code
+--------------------------------------------------------------------------
+JavaScript                   8            100           244            274
+--------------------------------------------------------------------------
+TOTAL:                       8            100           244            274
+--------------------------------------------------------------------------
+\end{verbatim}
+\newpage
+\begin{verbatim}
+--------------------------------------------------------------------------
+Fichiers                                 espace      commentaire      code
+--------------------------------------------------------------------------
+src/projects/AirQua.js                     26             59            95
+src/modules/PrototypeMQLIB.js              44            100            88
+src/projects/examples/wifi_web_server.js    7             37            37
+src/modules/MQ135.js                       20             39            36
+src/projects/examples/wifi.js               2              7             9
+src/projects/examples/led_blink.js          1              2             5
+src/modules/MQ135.min.js                    0              0             3
+src/modules/PrototypeMQLIB.min.js           0              0             1
+--------------------------------------------------------------------------
+TOTAL:                                    100            244           274
+--------------------------------------------------------------------------
+
+\end{verbatim}
+
+\subsubsection{Prototype MQLIB}
+J'ai commencé par une longue documentation sur le moteur JavaScript ESPRUINO et le microcontrôleur ESP8266.Ensuite, j'ai développé les exemples suivants:
+
+- ledblink.js: permet de de faire clignoté la LED de l'ESP8266:
+
+\begin{lstlisting}
+var ledIsOn = false;
+/ * 1000 milliseconds = 0.5 seconds */
+var interval = 1000; 
+setInterval(function(){
+  /*D2 is the blue LED on the ESP8266 boards
+  Assigns and flips the state on or off */
+  digitalWrite(D2, ledIsOn = !ledIsOn);
+}, interval);
+\end{lstlisting}
+
+- wifi.js: permet de se connecter à un réseau Wifi:
+
+
+\begin{lstlisting}
+var wifi = require("Wifi");
+
+/**
+ * Handles the connection for the wifi.connect call.
+ * @param {Error} err
+ */
+function onConnect(err) {
+    if(err) {
+        console.log("An error has occured :( ", err.message);
+    } else {
+        console.log("Connected IP Adress : ", wifi.getIP().ip);
+    }
+}
+wifi.connect("YourNetworkSSID", { password: "NetworkPassword" }, onConnect);
+\end{lstlisting}
+
+- wifiwebserver.js: c'est un serveur web qui affiche les réseaux Wifi disponibles autour:
+
+\begin{lstlisting}
+...
+
+var http = require("http");
+...
+
+/**
+ * Handles all requests for the simple HTTP server
+ * 
+ * @param {any} request - Incomming request
+ * @param {any} response - Response to client
+ */
+function handleRequest(request, response) {
+    //Handles all requests
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    //Scans for accessible networks
+    wifi.scan(function(networks){    
+        response.end(generatePage("Networks", generateTableForAPs(networks)));
+    });
+}
+...
+\end{lstlisting}
+
+Enfin, j'ai implémenté un prototype en JavaScript de MQLIB en m'inspirant d'un module existant et qui à était tester proprement sur ESPRUINO.
+
+\begin{lstlisting}
+exports.connect = function(mq_pin1, mq_pin2, mq_pin3) {
+  return new MQLIB(mq_pin1, mq_pin2, mq_pin3);
+}
+/** 
+* constructor3
+* @param mq_pin1 - analog input channel you are going to use
+* @param mq_pin2 - analog input channel you are going to use
+* @param mq_pin3 - analog input channel you are going to use
+*/
+function MQLIB(mq_pin1, mq_pin2, mq_pin3)
+{        
+...
+/**
+* this gives the current gas value
+* @param mq_pin - analog input channel
+* @param gas_id - target gas type
+* @return ppm of the target gas with the right sensor
+*/
+MQLIB.prototype.displayGasValue = function(mq_pin, gas_id)
+{
+    return (this.getGasPercentage(this.read(mq_pin) / this.tabR[mq_pin], gas_id));
+}
+\end{lstlisting}
+
+
+\subsubsection{AIRQUA}
+Suite à des restrictions matérielles liées ESP8266, qui contient un seul pin Analogique, j'ai implémenté un serveur avec un seul capteur (MQ135).
+le serveur offre les mêmes fonctions que la version Wifi implémentée en langage C.
+
+\begin{lstlisting}
+...
+/**
+* import MQ135.js module
+*/
+var mq = require("MQ135").connect(pin);
+...
+/**
+ *  display current sensor value to client.
+ *  @param sensorName is String argument which set sensor name.
+ *  @param is String argument which set sensor gas type.
+ *  @param value is String argument which set sensor value.
+ */
+function sensorValue(sensorName, gasTypes , value)
+{
+    return ("{\"name\":\"" +sensorName+ "\",\"gasTypes\":\"" +gasTypes+ "\",\"value\":\"" +value+ "\"}\n");
+ 
+}
+/**
+ *  display sensor informations to client in Json format.
+ *  @param sensorName is String argument which set sensor name.
+ *  @param model is String argument which set sensor model.
+ *  @param reference is String argument which set sensor reference.
+ *  @param unite is String argument which set sensor unite.
+ *  @param gasTypes is String argument which set sensor gas type (write it in
+ * Json nested array format ex. "[\"LPG\",\"CO\",\"SMOKE\"]" ).
+ */
+function sensorType(sensorName, model, reference,
+    unite, gasTypes)
+{
+    return ("{\"name\":\"" +sensorName+ "\",\"model\":\"" +model+ "\",\"reference\":\"" +reference+ "\",\"unite\":\"" +unite+ "\",\"gasTypes\":" +gasTypes+ "}\n");
+}
+...
+\end{lstlisting}
+
+\newpage
+\subsubsection{Tableau comparatif}
+La liste des commandes et les résultats sont exactement les mêmes comparés à la version Arduino développée en langage C.
+
+\begin{center}
+\centering
+\begin{tabular}{|p{7cm}|p{7cm}|}
+\hline
+Arduino C & Espruino JavaScript \\
+\hline
+\multicolumn{2}{|c|}{Avantages}\\
+\hline
+\hline
+Gestion de la mémoire très efficace. & Rapidité d’exécution.\\
+\hline
+\hline
+Faible consommation de ressources matériels & Code source court et compacte.\\
+\hline
+\hline
+Support de plusieurs capteurs analogiques & Support de plusieurs capteurs numériques.\\
+\hline
+\hline
+Support de la majorité des capteurs utilisés  & Processeur puissant et efficace \\
+\hline
+\hline
+Environnement de développement complet  & Support natif de l'API RESTfull.   \\
+\hline
+\hline
+\multicolumn{2}{|c|}{Inconvénients}\\
+\hline
+\hline
+Non support natif de l'API RESTfull  & Consommation d'avantage de ressources matériels que Arduino\\
+\hline
+\hline
+Problème de latence comparé à la version JavaScript  & Ajout obligatoire de Multiplexeur pour le support de plusieurs capteurs analogiques\\
+\hline
+\end{tabular}
+\end{center}

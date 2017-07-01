@@ -1,0 +1,19 @@
+\section*{Résumé}
+\addcontentsline{toc}{section}{Résumé}
+
+Avec l’émergence de l’\href{https://fr.wikipedia.org/wiki/Internet_des_objets}{Internet des Objets} , de nombreux équipements «connectés» ont vu le jour (bracelets, capteurs domotiques, etc.) et peuvent se connecter aux téléphones des usagers pour synchroniser leurs données. Le téléphone ne joue plus uniquement le rôle de capteur mais aussi de relais de l’information.\\
+
+Dans le cadre de mes études, je participe à un projet visant étudier le cas de la technologie \href{https://www.arduino.cc/}{Arduino} qui permet de concevoir ses propres objets connectés. En particulier, nous souhaitons offrir à la communauté Arduino la possibilité de publier les données issues de n’importe quel capteur (gaz, lumière, son, etc.) sur l’Internet via une connexion Internet qui serait mise à disposition par le téléphone (e.g., via son interface Bluetooth). L’objectif est donc de développer un kit de développement (SDK) pour Arduino qui permette de publier des données de manière passive (à la demande du téléphone) ou réactive (à l’initiative du capteur Arduino). Ce kit de développement sera conçu au dessus de la technologie JavaScript pour IOT et illustré sur le cas d’une application de surveillance de la qualité de l’air qui pourra être déployée à l’échelle de l’université.\\
+
+Afin de développer une solution pour la publication des données collectées, je devrai implémenter, une librairie qui gère  des capteurs de qualité de l'air de type \href{http://www.china-total.com/Product/meter/gas-sensor/Gas-sensor.htm}{MQ} avec le langage C et la porter en JavaScript par la suite. 
+Ensuite, je devrai coder un serveur web (Wifi et Ethernet) afin de l'utiliser pour envoyer les données collectées par les capteurs de qualité de l'air dans le but de les partager sous format de données JSON, dans un premier temps en utilisant le langage C et puis le JavaScript.
+La troisième tâche consistera à faire transiter les données collectées par les capteurs en utilisant la technologie \href{https://www.bluetooth.com/}{Bluetooth}, cette partie sera implémentée en \href{https://fr.wikipedia.org/wiki/C_(langage)}{langage C}.\\
+
+Pour cela, je devrai prendre en main le matériel mis à disposition et  les différentes technologies liées aux composants.
+Je suis confronté à de nombreux problèmes liés au manque de documentation et au long processus de débogage, car quand on travaille sur du matériel, il n’y a pas de débogueur performant pour m'aider.
+Je devrai trouver une solution performante qui s'adapte aux microcontrôleurs de type Arduino et rendre mon projet modulable dans le but de faciliter la prise en main et l’intégration de nouveaux capteurs.  
+
+%\section*{Abstract}
+%\addcontentsline{toc}{section}{Abstract}
+
+\newpage

@@ -1,0 +1,273 @@
+% --------------------------------------
+% Document Class
+% --------------------------------------
+\documentclass[a4paper, 11pt]{article}
+% --------------------------------------
+
+% --------------------------------------
+% Use Package
+% --------------------------------------
+
+% french, english
+\usepackage[francais]{babel}
+
+% font, french accent
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc} 
+
+% page layout
+\usepackage{geometry}
+\usepackage{multicol}
+\setlength{\columnsep}{4cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{dirtree}
+\usepackage{csquotes}
+\usepackage{geometry,array}
+\usepackage{forest}
+\usepackage[bottom]{footmisc}
+% hypertext link
+\usepackage[pdfpagelabels]{hyperref}
+\usepackage{footnotebackref}
+
+
+\usetikzlibrary{shadows}
+\newcolumntype{C}[1]{@{}>{\centering\arraybackslash}m{#1}@{}}
+% table of contents setting
+\usepackage[]{titletoc}
+
+% include pdf
+\usepackage[final]{pdfpages}
+
+% insert code
+\usepackage{listings}
+
+% define our color
+\usepackage{xcolor}
+
+\usepackage{titlesec}
+
+% bibliographie
+\usepackage[nottoc, notlof, notlot]{tocbibind}
+%\usepackage{natbib}
+%\usepackage{filecontents}
+
+
+\usepackage{caption}
+\usepackage{tocloft}
+
+
+
+\newcommand{\listappendicesname}{{\Large  Table des annexes}}
+\newlistof{appendices}{apc}{\listappendicesname}
+\newcommand{\appendices}[1]{%
+  \refstepcounter{appendices}%
+  \addcontentsline{apc}{appendices}{\hspace{17pt}\numberline{\theappendices}#1}%
+}
+
+\newcommand{\newappendix}[1]{\section*{#1}\appendices{#1}}
+
+% code color
+\definecolor{ligthyellow}{RGB}{250,247,220}
+\definecolor{darkblue}{RGB}{5,10,85}
+\definecolor{ligthblue}{RGB}{1,147,128}
+\definecolor{darkgreen}{RGB}{8,120,51}
+\definecolor{darkred}{RGB}{160,0,0}
+\definecolor{univ}{RGB}{177,23,119}
+\definecolor{univmodif}{RGB}{148,74,120}
+\definecolor{mygray}{RGB}{100,100,100}
+\definecolor{folderbg}{RGB}{124,166,198}
+\definecolor{folderborder}{RGB}{110,144,169}
+
+\def\Size{4pt}
+\tikzset{
+      folder/.pic={
+        \filldraw[draw=folderborder,top color=folderbg!50,bottom color=folderbg]
+          (-1.05*\Size,0.2\Size+5pt) rectangle ++(.75*\Size,-0.2\Size-5pt);  
+        \filldraw[draw=folderborder,top color=folderbg!50,bottom color=folderbg]
+          (-1.15*\Size,-\Size) rectangle (1.15*\Size,\Size);
+      }
+    }
+
+\lstset{
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    captionpos=b,
+    extendedchars=true,
+    frame=lines,
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    keepspaces=true,
+    breaklines=true,
+    showspaces=false,
+    showstringspaces=false,
+    breakatwhitespace=false,
+    stepnumber=1,
+    showtabs=false,
+    tabsize=3,
+    basicstyle=\small\ttfamily,
+    backgroundcolor=\color{ligthyellow},
+    keywordstyle=\color{ligthblue},
+    morekeywords={include, printf, uchar},
+    identifierstyle=\color{darkblue},
+    commentstyle=\color{darkgreen},
+    stringstyle=\color{darkred},
+}
+
+
+% --------------------------------------
+
+
+
+% --------------------------------------
+% Page setting
+% --------------------------------------
+%\pagestyle{empty}
+
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{3}
+
+\makeatletter
+\@addtoreset{chapter}{part}
+\makeatother 
+
+\hypersetup{         % parametrage des hyperliens
+  colorlinks=true,      % colorise les liens
+  breaklinks=true,      % permet les retours à la ligne pour les liens trop longs
+  urlcolor= blue,       % couleur des hyperliens
+  linkcolor= black,     % couleur des liens internes aux documents (index, figures, tableaux, equations,...)
+  citecolor= green      % couleur des liens vers les references bibliographiques
+}
+
+% --------------------------------------
+
+
+% --------------------------------------
+% Table of contents setting
+% --------------------------------------
+\makeatletter
+% Patch, that hooks into \contentsline to store the
+% level name in \nl@current@levelname.
+%   If package 'hyperref' is loaded, then this
+% needs to be called *after* package `hyperref`.
+\AtBeginDocument{%
+  \let\nl@org@contentsline\contentsline
+  \def\contentsline#1{%
+    \def\nl@current@levelname{#1}%
+    \nl@org@contentsline{#1}%
+  }%
+}
+
+% \numberline evaluates \nl@current@levelname to find
+% the horizontal alignment
+\protected\def\numberline#1{%
+  \begingroup
+    \edef\nl@align{%
+      nl@align@%
+      \@ifundefined{nl@current@levelname}{}{\nl@current@levelname}%
+    }%
+    \edef\nl@align{%
+      \@ifundefined{\nl@align}\nl@align@{\csname\nl@align\endcsname}%
+    }%
+    \@ifundefined{nl@numberline@\nl@align}{%
+      \errmessage{Unknown alignment '\nl@align' for \noexpand\numberline}%
+      \nl@numberline@l{#1}%
+    }{%
+      \csname nl@numberline@\nl@align\endcsname{#1}%
+    }%
+  \endgroup
+}
+
+% Implementations of `\numberline` for the different horizontal alignments
+\newcommand*{\nl@numberline@l}[1]{% left-aligned
+  \hb@xt@\@tempdima{#1 \hfil}%
+}
+\newcommand*{\nl@numberline@c}[1]{% centered
+  \hb@xt@\@tempdima{\hfil#1 \hfil}%
+}
+\newcommand*{\nl@numberline@r}[1]{% right-aligned
+  \hb@xt@\@tempdima{\hfil#1 }%
+}
+
+% Configuration
+% -------------
+% Horizonal alignment in \numberline:
+%   l: left-aligned
+%   c: centered
+%   r: right-aligned
+% \nl@align@: Default setting
+% \nl@align@<levelname>: Setting for specific level
+
+\def\nl@align@{l}% default
+\def\nl@align@section{r}
+
+\makeatother
+
+\contentsfinish
+% --------------------------------------
+
+
+% --------------------------------------
+% Information
+% --------------------------------------
+\title{Compte-rendu projet individuel 61 : Intégration de capteurs Arduino dans une plate-forme de mobile crowdsourcing}
+\author{Auteur : Moncef AOUDIA\\
+	Encadrant : Romain ROUVOY, Antoine VEUILLER\\}
+% --------------------------------------
+
+
+
+% --------------------------------------
+% Begin content
+% --------------------------------------
+\begin{document}
+
+  % Set language to french
+  \selectlanguage{francais}
+  
+  % Start the page counting
+  \pagenumbering{arabic}
+  
+  % page de garde
+  \include{partie/garde}
+  
+  \include{style}
+  
+  %\maketitle
+  %\mbox{}
+  
+ 
+  
+  \newpage
+  \clearpage
+  
+  
+  \include{partie/remerciment}
+  \include{partie/abstract}
+  
+  \tableofcontents
+  \newpage
+  \listoffigures
+  %\ \\
+  %\listofappendices
+    
+  \include{partie/introduction}
+  \include{partie/existant}
+  %\include{partie/test}
+  \include{partie/implementation}
+  \include{partie/conclusion}
+  %\include{partie/annexe}
+  
+  % ne pas oublié de citer quelque chose pour que la biblio apparaisse
+  \nocite{*}
+  \bibliographystyle{alphadin}
+  \bibliography{partie/biblio}
+  
+\end{document}

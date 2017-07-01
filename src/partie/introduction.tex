@@ -1,0 +1,47 @@
+\section{Introduction}
+
+Pour mes études de master informatique à l'université de Lille 1, je participerai à un projet proposé par l'équipe SPIRALS\footnote{Self-adaptation for distributed services and large software systems} de l'INRIA\footnote{Institut national de recherche en informatique et en automatique} de Lille de recherche afin de découvrir ce milieu. 
+Étant intéressé par le domaine des systèmes distribués et intergiciels et les objets connecté, j'ai choisi ce projet afin mettre en pratique mes compétences théoriques acquises durant mon cursus universitaire et avoir une expérience professionnelle. 
+
+\subsection{Présentation}
+Pour ce projet, je suis amené à développer une solution afin de collecter les données issues de capteurs de qualité de l'air et de pouvoir partager les données sur la plateforme \href{https://www.inria.fr/centre/lille/innovation/rii/rii-technologies-du-web/demos/apisense-r-accedez-a-une-foule-de-donnees-en-2-clics}{APISENSE} pour être exploitées par la suite.
+Cette solution a pour but de faciliter la collecte et le partage de données en utilisant la technologie Arduino via:
+\begin{itemize}
+\item Serveur Web Wifi: le microcontrôleur pourra collecter les données via ses capteurs et les partager avec une connexion Wifi.
+\item Serveur Web Ethernet: le microcontrôleur pourra collecter les données via ses capteurs et les partager avec une connexion Ethernet.
+\item Bluetooth: le microcontrôleur pourra collecter les données via ses capteurs et les partager avec une connexion Bluetooth. 
+\end{itemize}
+Ce type de projet utilise différentes technologies et exige du matériel assez spécifique.
+
+
+% Contexte
+\subsection{Contexte}
+Pour la réalisation de ce projet, je travaille avec l'équipe SPIRALS qui mène des activités de recherche dans les domaines des systèmes répartis et des sciences du logiciel. Ils ont pour but d'introduire plus d'autonomie dans les mécanismes d'adaptation des systèmes logiciels, en particulier, afin d'assurer la transition des systèmes adaptatifs vers les systèmes autoadaptatifs. Ils visent plus particulièrement deux propriétés : l'autoguérison et l'auto-optimisation. Avec l'autoguérison, ils ont pour but d'étudier et d'adapter des solutions de fouille de données et d'apprentissage à la conception et la mise en œuvre de systèmes logiciels, plus particulièrement en vue de la réparation automatique des systèmes logiciels. Avec l'auto-optimisation, ils ont pour but de partager, collecter et analyser les comportements dans un environnement réparti afin de continuellement adapter, optimiser et maintenir en fonctionnement des systèmes logiciels et d'aller vers l'obtention de systèmes distribués éternels.\\ 
+
+Le projet sur lequel je travaille est effectué à l'INRIA de Lille et il s'étale sur la durée de tout le deuxième semestre du master informatique. Je suis supervisé par Mr VEUILLER à l'INRIA et Mr ROUVOY à l'université de Lille 1.\\
+
+% Problème
+\subsection{Problématiques}
+Le défi est lié au grand nombre de capteurs de gaz disponible et au manque de documentation.Le travail de recherche sera essentiel pour l'aboutissement du projet.\\
+
+Il faut pour cela concentrer mes efforts sur les capteurs de type \href{http://www.china-total.com/Product/meter/gas-sensor/Gas-sensor.htm}{MQ} afin de de réaliser une librairie Arduino qui les supportent.
+De plus, le projet doit être modulable afin de pouvoir intégrer de nouveaux capteurs facilement.\\
+
+Au niveau de la partie transfert de données, les différentes technologies utilisées rendent le travail plus difficile, car entre la version Wifi, Ethernet et Bluetooth, c'est une implémentation avec deux approches différentes à cause des restrictions liées au Bluetooth.\\
+
+Les langages de programmation utilisés demandent une prise en main particulière, car le langage C pour Arduino est une version allégée du C et ça s'applique aussi à la partie JavaScript.\\
+
+L'optimisation mémoire est très importante dans la partie développement, on risque vite de saturer cette dernière si on ne fait pas attention à notre code et ça peut avoir des répercussions sur les performances du microcontrôleur sur le court ou le long terme.\\
+
+L’écriture de la documentation du projet et des différents Readme\footnote{Un fichier readme (en français, lisezmoi) est un fichier contenant des informations sur les autres fichiers du même répertoire} prend du temps et souvent elle contient des manipulations très poussées qui peuvent paraître difficile à réaliser dans un premier temps.\\
+
+
+% Objectifs
+\subsection{Objectifs du projet}
+Le premier objectif est d’implémenter une libraire Arduino qui gère les capteurs de qualité de l’air de type MQ d’une manière modulable, car elle supporte 3 capteurs au début (MQ2, MQ6, MQ8), par la suite on doit pouvoir ajouter d’autre capteurs facilement.\\
+Le deuxième objectif consiste à développer un serveur Web qui pour Arduino, qui fera le lien entre les capteurs de gaz et la plateforme APISENSE, entre cette dernière et le serveur on peut utiliser un téléphone ou tout autre appareil compatible.\\ 
+Le dernier objectif est d'implémenter les mêmes fonctionnalités du projet Arduino C en JavaScript, pour des raisons d'interopérabilité, le projet sera donc compatible pas avec Arduino seulement, mais avec tous les microcontrôleurs supportés par le moteur JavaScript.\\
+Pour répondre aux différentes problématiques évoquées en haut, je devais d'abord voir le matériel mis à disposition pour la réalisation du projet et lire la documentation et les fiches de données des capteurs, ainsi que voir les différents projets réalisés sous Arduino disponible sur Internet.\\
+Je détaillerai toutes les démarches pour résoudre les problématiques et j'expliquerai la solution finale que j’ai implémentée dans le projet.
+
+\newpage
